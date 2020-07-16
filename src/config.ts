@@ -4,4 +4,7 @@ export const config = {
   stripeKey: 'pk_test_JwRX4cevuCysIEQrpwcbn3j8',
   categoryPageSize: 8,
   maxCompareProducts: 4,
+  algoliaAppId: 'L1TT97EBOE',
+  algoliaApiKey: 'placeholder',
+  algoliaIndexName: 'product',
 };
