@@ -6,8 +6,9 @@ export const config = {
   maxCompareProducts: 4,
   algoliaAppId: '6MAFUOD23U',
   algoliaApiKey: 'placeholder',
+  algoliaPlacesAppId: 'plEPUZAA2D2L',
+  algoliaPlacesApiKey: 'placeholder',
   algoliaIndexName: 'product',
   compareKeys: [],
-  shopkitSrc: 'https://btn.moltin.com',
   endpointURL: 'api.moltin.com',
 };
