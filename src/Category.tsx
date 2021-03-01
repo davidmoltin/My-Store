@@ -14,23 +14,23 @@ function useCategoryProducts(categoryId: string | undefined, pageNum: number) {
   const { selectedLanguage } = useTranslation();
   const { selectedCurrency } = useCurrency();
 
-  const [totalPages, setTotalPages] = useState<number>();
+  //const [totalPages, setTotalPages] = useState<number>();
 
-  useEffect(() => {
-    // reset number of pages only when changing categories
-    setTotalPages(undefined);
-  }, [categoryId]);
+  // useEffect(() => {
+  //   // reset number of pages only when changing categories
+  //   setTotalPages(undefined);
+  // }, [categoryId]);
 
   const [products] = useResolve(async () => {
     // during initial loading of categories categoryId might be undefined
     if (categoryId) {
-      const result = await loadCategoryProducts(categoryId, pageNum, selectedLanguage, selectedCurrency);
-      setTotalPages(result.meta.page.total);
+      const result = await loadCategoryProducts('44b094ea-e58b-4f38-9c24-e548f11d7c7e', categoryId, pageNum, selectedLanguage, selectedCurrency);
+      //setTotalPages(result.meta.page.total);
       return result;
     }
   }, [categoryId, pageNum, selectedLanguage, selectedCurrency]);
 
-  return { products, totalPages };
+  return { products };
 }
 
 interface CategoryParams {
@@ -47,7 +47,7 @@ export const Category: React.FC = () => {
   const parsedPageNum = parseInt(params.pageNum!);
   const pageNum = isNaN(parsedPageNum) ? 1 : parsedPageNum;
 
-  const { products, totalPages } = useCategoryProducts(category?.id, pageNum);
+  const { products } = useCategoryProducts('0b0b9087-2900-4a51-bc0d-493fb58fd28c', pageNum);
 
   return (
     <div className="category">
@@ -67,14 +67,14 @@ export const Category: React.FC = () => {
           <h1 className="category__categoryname">{category?.name ?? ' '}</h1>
 
           <ul className="category__productlist">
-            {products && products.data.map(product => (
+            {products && products.data.map((product: any) => (
               <li key={product.id} className="category__product">
                 <ProductThumbnail product={product} />
               </li>
             ))}
           </ul>
 
-          <div className="category__pagination">
+          {/* <div className="category__pagination">
             {totalPages && (
               <Pagination
                 totalPages={totalPages}
@@ -82,7 +82,7 @@ export const Category: React.FC = () => {
                 formatUrl={(page) => createCategoryUrl(categorySlug, page)}
               />
             )}
-          </div>
+          </div> */}
         </>
       ) : (
         <div className="loader" />

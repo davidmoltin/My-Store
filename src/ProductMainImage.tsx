@@ -4,14 +4,15 @@ import { loadImageHref } from './service';
 import { useResolve } from './hooks';
 import { ImageContainer } from './ImageContainer';
 import { APIErrorContext } from './APIErrorProvider';
+import imagePlaceHolder from './images/img_missing_horizontal@2x.png'
 
 interface ProductMainImageProps {
-  product: moltin.Product;
+  product: any;
   size?: number;
 }
 
 export const ProductMainImage: React.FC<ProductMainImageProps> = (props) => {
-  const productMainImageId = props.product?.relationships?.main_image?.data?.id;
+  const productMainImageId = '';
   const { addError } = useContext(APIErrorContext);
   const [productImageUrl] = useResolve(
     async () => {
@@ -25,15 +26,22 @@ export const ProductMainImage: React.FC<ProductMainImageProps> = (props) => {
     },
     [productMainImageId, addError]
   );
-  const productBackground = props.product?.background_color ?? '';
+  const productBackground = '';
 
   return (
     <>
-      {productImageUrl && (
+      {productImageUrl ? (
         <ImageContainer
         imgClassName="productmainimage"
         imgUrl={productImageUrl}
-        alt={props.product.name}
+        alt={props.product.attributes.name}
+        imageStyle={{ width: props.size, height: props.size, objectFit: 'fill', backgroundColor: productBackground }}
+        />
+      ) : (
+        <ImageContainer
+        imgClassName="productmainimage"
+        imgUrl={imagePlaceHolder}
+        alt={props.product.attributes.name}
         imageStyle={{ width: props.size, height: props.size, objectFit: 'fill', backgroundColor: productBackground }}
         />
       )}

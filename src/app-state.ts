@@ -13,7 +13,7 @@ import {
   editCartInfo,
   addCustomerAssociation,
   loadCustomerAuthenticationSettings,
-  loadOidcProfiles
+  loadOidcProfiles,
 } from './service';
 
 import { config } from './config';
@@ -552,6 +552,18 @@ function useMultiCartDataState() {
   }
 }
 
+function usePriceBookDataState() {
+  const [priceBookId, setPriceBookId] = useState<any>();
+
+  useEffect(() => {
+    setPriceBookId('6e886882-1828-4ebf-8afc-be98ee3ef7f5')
+  }, []);
+
+  return {
+    priceBookId
+  };
+}
+
 function useGlobalState() {
   const translation = useTranslationState();
   const currency = useCurrencyState();
@@ -559,6 +571,7 @@ function useGlobalState() {
   const ordersData = usePurchaseHistoryState();
   const cartData = useCartItemsState();
   const multiCartData = useMultiCartDataState();
+  const priceBookData = usePriceBookDataState();
 
   return {
     translation,
@@ -568,6 +581,7 @@ function useGlobalState() {
     cartData,
     multiCartData,
     currency,
+    priceBookData,
     categories: useCategoriesState(translation.selectedLanguage),
     compareProducts: useCompareProductsState(),
     authenticationSettings: useCustomerAuthenticationSettingsState(),
@@ -586,6 +600,7 @@ export const [
   useCustomerAuthenticationSettings,
   useCartData,
   useMultiCartData,
+  usePriceBook,
 ] = constate(
   useGlobalState,
   value => value.translation,
@@ -598,4 +613,5 @@ export const [
   value => value.authenticationSettings,
   value => value.cartData,
   value => value.multiCartData,
+  value => value.priceBookData,
 );

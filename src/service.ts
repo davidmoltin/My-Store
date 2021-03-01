@@ -55,20 +55,10 @@ function getProductCache(key: string, language: string, currency: string): molti
   return productCache[`${key}:${language}:${currency}`];
 }
 
-export async function loadCategoryProducts(categoryId: string, pageNum: number, language: string, currency: string): Promise<moltin.ResourcePage<moltin.Product>> {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency });
-
-  const result = await moltin.Products
-    .Offset((pageNum - 1) * config.categoryPageSize)
-    .Limit(config.categoryPageSize)
-    .Filter({
-      eq: {
-        category: {
-          id: categoryId
-        }
-      }
-    })
-    .All();
+export async function loadCategoryProducts(hierarchyId: string, categoryId: string, pageNum: number, language: string, currency: string): Promise<moltin.Resource<moltin.Product[]>> {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret, language, currency});
+  await moltin.Authenticate();
+  const result = await moltin.Hierarchies.Relationships.Products({hierarchyId: hierarchyId, nodeId: categoryId});
 
   for (const product of result.data) {
     setProductCache(product.id, language, currency, product);
@@ -291,4 +281,12 @@ export async function addCustomerAssociation(cartId: string, customerId: string,
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId });
   const result = await moltin.Cart(cartId).AddCustomerAssociation(customerId, token);
   return result;
+}
+
+export async function getPriceBookPrice(priceBookId: string, sku: string) {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret });
+  moltin.config.version = 'experimental';
+  await moltin.Authenticate();
+  const result = await moltin.request.send(`pricebooks/${priceBookId}/prices?filter=eq(sku,${sku})`, 'GET');
+  return result.data.length > 0 && result.data[0];
 }
