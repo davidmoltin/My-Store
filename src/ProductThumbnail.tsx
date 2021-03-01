@@ -7,7 +7,7 @@ import { CompareCheck } from './CompareCheck';
 import { ProductMainImage } from './ProductMainImage';
 import { isProductAvailable } from './helper';
 import { Availability } from './Availability';
-import { useCurrency, useTranslation } from './app-state';
+import { useCurrency, useTranslation, useCatalog } from './app-state';
 import { getPriceBookPrice } from './service';
 import { APIErrorContext } from './APIErrorProvider';
 import { config } from './config';
@@ -24,12 +24,13 @@ export const ProductThumbnail: React.FC<ProductThumbnailProps> = (props) => {
   const productUrl = createProductUrl(props.product.attributes.slug);
   const { selectedCurrency } = useCurrency();
   const { selectedLanguage } = useTranslation();
+  const { priceBookId } = useCatalog();
   const { addError } = useContext(APIErrorContext);
 
   const [price] = useResolve(
     async () => {
       try {
-        return getPriceBookPrice(config.priceBookId, props.product.attributes.sku);
+        return getPriceBookPrice(priceBookId, props.product.attributes.sku);
       } catch (error) {
         addError(error.errors);
       }

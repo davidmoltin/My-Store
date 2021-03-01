@@ -15,6 +15,8 @@ import {
   addCustomerAssociation,
   loadCustomerAuthenticationSettings,
   loadOidcProfiles,
+  getCatalogData,
+  getHierarchyId,
 } from './service';
 
 import { config } from './config';
@@ -299,69 +301,71 @@ function useCurrencyState() {
   }
 }
 
-function getCategoryPaths(categories: moltin.Category[]): { [categoryId: string]: moltin.Category[] } {
+function getCategoryPaths(categories: moltin.Node[]): { [categoryId: string]: moltin.Node[] } {
   const lastCat = categories[categories.length - 1];
 
-  let map: { [categoryId: string]: moltin.Category[] } = {
-    [lastCat.slug]: [...categories]
-  };
+  if (lastCat.attributes.slug) {
+    let map: { [categoryId: string]: moltin.Node[] } = {
+      [lastCat.attributes.slug]: [...categories]
+    };
 
-  const childCats = lastCat.children ?? [];
+    const childCats = lastCat.relationships.children.data ?? [];
 
-  for (const child of childCats) {
-    map = { ...map, ...getCategoryPaths([...categories, child]) };
+    for (const child of childCats) {
+      map = { ...map, ...getCategoryPaths([...categories, child]) };
+    }
+
+    return map;
   }
 
-  return map;
+  return {};
 }
 
-function mergeMaps(tree: moltin.Category[]): { [categoryId: string]: moltin.Category[] } {
+function mergeMaps(tree: moltin.Node[]): { [categoryId: string]: moltin.Node[] } {
   return tree.reduce((acc, c) => ({ ...acc, ...getCategoryPaths([c]) }), {});
 }
 
-function useCategoriesState(selectedLanguage: string) {
-  const [categoryPaths, setCategoryPaths] = useState<{ [categoryId: string]: moltin.Category[] }>();
-  const [categoriesTree, setCategoriesTree] = useState<moltin.Category[]>();
+// function useCategoriesState(selectedLanguage: string) {
+//   const [categoryPaths, setCategoryPaths] = useState<{ [categoryId: string]: moltin.Category[] }>();
+//   const [categoriesTree, setCategoriesTree] = useState<moltin.Category[]>();
 
-  useEffect(() => {
-    setCategoryPaths(undefined);
-    setCategoriesTree(undefined);
+//   useEffect(() => {
+//     setCategoryPaths(undefined);
+//     setCategoriesTree(undefined);
 
-    loadCategoryTree(selectedLanguage).then(result => {
-      setCategoriesTree(result);
-      setCategoryPaths(mergeMaps(result));
-    }).catch(err=>console.error(err));
-  }, [selectedLanguage]);
+//     loadCategoryTree(selectedLanguage).then(result => {
+//       setCategoriesTree(result);
+//       setCategoryPaths(mergeMaps(result));
+//     }).catch(err=>console.error(err));
+//   }, [selectedLanguage]);
 
-  const categoryPathBySlug = (slug: string) => {
-    return categoryPaths?.[slug];
-  };
+//   const categoryPathBySlug = (slug: string) => {
+//     return categoryPaths?.[slug];
+//   };
 
-  return {
-    categoriesTree,
-    categoryPathBySlug,
-  };
-}
+//   return {
+//     categoriesTree,
+//     categoryPathBySlug,
+//   };
+// }
 
-function useCategoriesNodeState() {
+function useCategoriesNodeState(hierarchyId: string) {
   const [categoryPaths, setCategoryPaths] = useState<any>();
   const [categoriesTree, setCategoriesTree] = useState<any>();
   useEffect(() => {
     setCategoryPaths(undefined);
     setCategoriesTree(undefined);
 
-    loadCategoryChildren(config.hierarchyId).then(result => {
-      setCategoriesTree(result);
-      const paths:any[] = [];
-      result.data.forEach(element => {
-        paths.push(element)
-      })
-      setCategoryPaths(paths);
-    });
+    if (hierarchyId) {
+      loadCategoryChildren(hierarchyId).then(result => {
+        setCategoriesTree(result);
+        setCategoryPaths(mergeMaps(result.data));
+      });
+    }
 
-  }, []);
+  }, [hierarchyId]);
   const categoryPathBySlug = (slug: string) => {
-    return categoryPaths?.["attributes"]?.[slug];
+    return categoryPaths?.[slug];
   };
   return {
     categoriesTree,
@@ -579,6 +583,25 @@ function useMultiCartDataState() {
   }
 }
 
+function useCatalogDataState() {
+  const [priceBookId, setPriceBookId] = useState('');
+  const [categoryHierarchyId, setCategoryHierarchyId] = useState('');
+
+  useEffect(() => {
+    getCatalogData(config.catalogId).then(res => {
+      setPriceBookId(res.data.attributes.pricebook_id);
+      getHierarchyId(res.data.attributes.hierarchy_ids, 'categories').then(res => {
+        setCategoryHierarchyId(res);
+      });
+    });
+  }, []);
+
+  return {
+    priceBookId,
+    categoryHierarchyId,
+  }
+}
+
 function useGlobalState() {
   const translation = useTranslationState();
   const currency = useCurrencyState();
@@ -586,6 +609,7 @@ function useGlobalState() {
   const ordersData = usePurchaseHistoryState();
   const cartData = useCartItemsState();
   const multiCartData = useMultiCartDataState();
+  const catalogData = useCatalogDataState();
 
   return {
     translation,
@@ -595,7 +619,8 @@ function useGlobalState() {
     cartData,
     multiCartData,
     currency,
-    categories: useCategoriesNodeState(),
+    catalogData,
+    categories: useCategoriesNodeState(catalogData.categoryHierarchyId),
     compareProducts: useCompareProductsState(),
     authenticationSettings: useCustomerAuthenticationSettingsState(),
   };
@@ -608,6 +633,7 @@ export const [
   useAddressData,
   useOrdersData,
   useCurrency,
+  useCatalog,
   useCategories,
   useCompareProducts,
   useCustomerAuthenticationSettings,
@@ -620,6 +646,7 @@ export const [
   value => value.addressData,
   value => value.ordersData,
   value => value.currency,
+  value => value.catalogData,
   value => value.categories,
   value => value.compareProducts,
   value => value.authenticationSettings,

@@ -46,26 +46,26 @@ export async function loadCategoryTree(language: string): Promise<moltin.Categor
   return result.data;
 }
 
-const productCache: { [id: string]: moltin.Product } = {};
+const productCache: { [id: string]: moltin.PcmProduct } = {};
 
-function setProductCache(key: string, language: string, currency: string, product: moltin.Product) {
+function setProductCache(key: string, language: string, currency: string, product: moltin.PcmProduct) {
   productCache[`${key}:${language}:${currency}`] = product;
 }
 
-function getProductCache(key: string, language: string, currency: string): moltin.Product | undefined {
+function getProductCache(key: string, language: string, currency: string): moltin.PcmProduct | undefined {
   return productCache[`${key}:${language}:${currency}`];
 }
 
-export async function loadCategoryProducts(hierarchyId: string, categoryId: string, pageNum: number, language: string, currency: string): Promise<moltin.Resource<moltin.Product[]>> {
+export async function loadCategoryProducts(hierarchyId: string, categoryId: string, pageNum: number, language: string, currency: string): Promise<moltin.Resource<moltin.PcmProduct[]>> {
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret, language, currency});
   await moltin.Authenticate();
   const result = await moltin.Hierarchies.Relationships.Products({hierarchyId: hierarchyId, nodeId: categoryId});
 
   for (const product of result.data) {
-    setProductCache(product.id, language, currency, product);
+    setProductCache(product.id, language, currency, product as any as moltin.PcmProduct);
   }
 
-  return result;
+  return result as any as moltin.Resource<moltin.PcmProduct[]>;
 }
 
 const imageHrefCache: { [key: string]: string } = {};
@@ -98,7 +98,7 @@ export async function loadImageHref(imageId: string): Promise<string | undefined
   return result.data.link.href;
 }
 
-export async function loadProductBySlug(productSlug: string, language: string, currency: string): Promise<moltin.Product> {
+export async function loadProductBySlug(productSlug: string, language: string, currency: string): Promise<moltin.PcmProduct> {
   const cachedProduct = getProductCache(productSlug, language, currency);
 
   if (cachedProduct) {
@@ -107,7 +107,7 @@ export async function loadProductBySlug(productSlug: string, language: string, c
 
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency });
 
-  const resultSlug = await moltin.Products
+  const resultSlug = await moltin.PCM
     .Limit(1)
     .Filter({
       eq: {
@@ -117,10 +117,10 @@ export async function loadProductBySlug(productSlug: string, language: string, c
     .All();
 
   const productId = resultSlug?.data[0]?.id;
-  const result = await moltin.Products.Get(productId);
+  const result = await moltin.PCM.Get(productId);
   const product = result.data;
 
-  setProductCache(product.slug, language, currency, product);
+  setProductCache(product.attributes.slug, language, currency, product);
 
   return product;
 }
@@ -297,4 +297,19 @@ export async function loadCategoryChildren(hierarchyId: string) : Promise<moltin
   await moltin.Authenticate();
   const result = await moltin.Hierarchies.Children(hierarchyId);
   return result;
+}
+
+export async function getCatalogData(catalogId: string) : Promise<moltin.Resource<moltin.Catalog>>{
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret });
+  await moltin.Authenticate();
+  const result = await moltin.Catalogs.Get(catalogId);
+  return result;
+}
+
+export async function getHierarchyId(hierarchyIds: string[], hierarchyType: string) {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret });
+  await moltin.Authenticate();
+  const result = await moltin.Hierarchies.All();
+  const id = result.data.find(hierarchy => hierarchyIds.includes(hierarchy.id) && hierarchy.attributes.name === hierarchyType);
+  return id ? id.id : '';
 }

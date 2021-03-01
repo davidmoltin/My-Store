@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import useOnclickOutside from 'react-cool-onclickoutside';
 import { useResolve, useProductImages } from './hooks';
-import { addToCart, loadProductBySlug } from './service';
+import { addToCart, loadProductBySlug, getPriceBookPrice } from './service';
 import { CompareCheck } from './CompareCheck';
 import { SocialShare } from './SocialShare';
 import {
@@ -11,6 +11,7 @@ import {
   useCartData,
   useMultiCartData,
   useCustomerData,
+  useCatalog,
 } from "./app-state";
 import { isProductAvailable } from './helper';
 import { Availability } from './Availability';
@@ -20,8 +21,11 @@ import { ReactComponent as CloseIcon } from './images/icons/ic_close.svg';
 import { ReactComponent as SpinnerIcon } from './images/icons/ic_spinner.svg';
 import { ReactComponent as CaretIcon } from './images/icons/ic_caret.svg';
 import { APIErrorContext } from './APIErrorProvider';
+import { config } from './config';
 
 import './Product.scss';
+
+import imagePlaceHolder from './images/img_missing_horizontal@2x.png'
 
 
 interface ProductParams {
@@ -36,6 +40,7 @@ export const Product: React.FC = () => {
   const { updateCartItems, setCartQuantity, handleShowCartPopup } = useCartData();
   const { isLoggedIn } = useCustomerData();
   const { multiCartData, updateCartData, updateSelectedCart, setIsCartSelected } = useMultiCartData();
+  const { priceBookId } = useCatalog();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -62,6 +67,17 @@ export const Product: React.FC = () => {
   );
   const [productId, setProductId] = useState('');
 
+  const [price] = useResolve(
+    async () => {
+      try {
+        return product && getPriceBookPrice(priceBookId, product.attributes.sku);
+      } catch (error) {
+        addError(error.errors);
+      }
+    },
+    [product, addError]
+  );
+
   useEffect(() => {
     product && setProductId(product.id);
   }, [product]);
@@ -70,15 +86,15 @@ export const Product: React.FC = () => {
     document.body.style.overflow = modalOpen ? 'hidden' : 'unset';
   }, [modalOpen])
 
-  const productImageHrefs = useProductImages(product);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const isPrevImageVisible = currentImageIndex > 0;
-  const isNextImageVisible = currentImageIndex < (productImageHrefs?.length ?? 0) - 1;
-  const productBackground = product?.background_color ?? '';
+  // const productImageHrefs = useProductImages(product);
+  // const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  // const isPrevImageVisible = currentImageIndex > 0;
+  // const isNextImageVisible = currentImageIndex < (productImageHrefs?.length ?? 0) - 1;
+  // const productBackground = product?.background_color ?? '';
 
-  const handlePrevImageClicked = () => {
-    setCurrentImageIndex(currentImageIndex - 1);
-  };
+  // const handlePrevImageClicked = () => {
+  //   setCurrentImageIndex(currentImageIndex - 1);
+  // };
 
   const handleAddToCart = (cartId?: string) => {
     const currentCart = localStorage.getItem("mcart") || "";
@@ -100,9 +116,9 @@ export const Product: React.FC = () => {
       })
   };
 
-  const handleNextImageClicked = () => {
-    setCurrentImageIndex(currentImageIndex + 1);
-  };
+  // const handleNextImageClicked = () => {
+  //   setCurrentImageIndex(currentImageIndex + 1);
+  // };
 
   const handleVariationChange = (childID: string) => {
     setProductId(childID);
@@ -196,7 +212,8 @@ export const Product: React.FC = () => {
       {product ? (
         <div className="product__maincontainer">
           <div className="product__imgcontainer">
-            {productImageHrefs.length > 0 && (
+            <img className="product__img" src={imagePlaceHolder} alt={product.attributes.name} />
+            {/* {productImageHrefs.length > 0 && (
               <>
                 <img className="product__img" src={productImageHrefs?.[currentImageIndex]} alt={product.name} style={{ backgroundColor: productBackground }} />
                 {isPrevImageVisible && (
@@ -210,19 +227,19 @@ export const Product: React.FC = () => {
                   </button>
                 )}
               </>
-            )}
+            )} */}
           </div>
           <div className="product__details">
             <h1 className="product__name">
-              {product.name}
+              {product.attributes.name}
             </h1>
             <div className="product__sku">
-              {product.sku}
+              {product.attributes.sku}
             </div>
             <div className="product__price">
-              {product.meta.display_price.without_tax.formatted}
+            {price && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format(price.attributes.currencies[selectedCurrency].amount/100)}
             </div>
-            <Availability available={isProductAvailable(product)} />
+            {/* <Availability available={isProductAvailable(product)} />
             <div className="product__comparecheck">
               <CompareCheck product={product} />
             </div>
@@ -230,17 +247,17 @@ export const Product: React.FC = () => {
               product.meta.variations
                 ? <VariationsSelector product={product} onChange={handleVariationChange} />
                 : ''
-            }
+            } */}
             <div className="product__moltinbtncontainer">
               <div ref={dropdownRef}>
                 <CartButton/>
               </div>
             </div>
             <div className="product__description">
-              {product.description}
+              {product.attributes.description}
             </div>
             <div className="product__socialshare">
-              <SocialShare name={product.name} description={product.description} imageHref={productImageHrefs?.[0]} />
+              <SocialShare name={product.attributes.name} description={product.attributes.description || ''} imageHref="" />
             </div>
           </div>
         </div>
