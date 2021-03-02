@@ -7,9 +7,10 @@ import { CompareCheck } from './CompareCheck';
 import { ProductMainImage } from './ProductMainImage';
 import { isProductAvailable } from './helper';
 import { Availability } from './Availability';
-import { useCurrency, useTranslation, usePriceBook } from './app-state';
+import { useCurrency, useTranslation } from './app-state';
 import { getPriceBookPrice } from './service';
 import { APIErrorContext } from './APIErrorProvider';
+import { config } from './config';
 
 
 import './ProductThumbnail.scss';
@@ -23,18 +24,17 @@ export const ProductThumbnail: React.FC<ProductThumbnailProps> = (props) => {
   const productUrl = createProductUrl(props.product.attributes.slug);
   const { selectedCurrency } = useCurrency();
   const { selectedLanguage } = useTranslation();
-  const { priceBookId } = usePriceBook();
   const { addError } = useContext(APIErrorContext);
 
   const [price] = useResolve(
     async () => {
       try {
-        return getPriceBookPrice(priceBookId, props.product.attributes.sku);
+        return getPriceBookPrice(config.priceBookId, props.product.attributes.sku);
       } catch (error) {
         addError(error.errors);
       }
     },
-    [priceBookId, props.product, addError]
+    [props.product, addError]
   );
 
   return (

@@ -7,6 +7,7 @@ import { ProductThumbnail } from './ProductThumbnail';
 import { createCategoryUrl } from './routes';
 import { Pagination } from './Pagination';
 import { useResolve } from './hooks';
+import { config } from './config';
 
 import './Category.scss';
 
@@ -24,7 +25,7 @@ function useCategoryProducts(categoryId: string | undefined, pageNum: number) {
   const [products] = useResolve(async () => {
     // during initial loading of categories categoryId might be undefined
     if (categoryId) {
-      const result = await loadCategoryProducts('44b094ea-e58b-4f38-9c24-e548f11d7c7e', categoryId, pageNum, selectedLanguage, selectedCurrency);
+      const result = await loadCategoryProducts(config.hierarchyId, categoryId, pageNum, selectedLanguage, selectedCurrency);
       //setTotalPages(result.meta.page.total);
       return result;
     }
@@ -47,7 +48,7 @@ export const Category: React.FC = () => {
   const parsedPageNum = parseInt(params.pageNum!);
   const pageNum = isNaN(parsedPageNum) ? 1 : parsedPageNum;
 
-  const { products } = useCategoryProducts('0b0b9087-2900-4a51-bc0d-493fb58fd28c', pageNum);
+  const { products } = useCategoryProducts(category.id, pageNum);
 
   return (
     <div className="category">
