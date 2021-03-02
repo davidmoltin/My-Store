@@ -21,7 +21,6 @@ import { ReactComponent as CloseIcon } from './images/icons/ic_close.svg';
 import { ReactComponent as SpinnerIcon } from './images/icons/ic_spinner.svg';
 import { ReactComponent as CaretIcon } from './images/icons/ic_caret.svg';
 import { APIErrorContext } from './APIErrorProvider';
-import { config } from './config';
 
 import './Product.scss';
 
@@ -75,7 +74,7 @@ export const Product: React.FC = () => {
         addError(error.errors);
       }
     },
-    [product, addError]
+    [priceBookId, product, addError]
   );
 
   useEffect(() => {

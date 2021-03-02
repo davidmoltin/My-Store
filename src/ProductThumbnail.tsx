@@ -10,8 +10,6 @@ import { Availability } from './Availability';
 import { useCurrency, useTranslation, useCatalog } from './app-state';
 import { getPriceBookPrice } from './service';
 import { APIErrorContext } from './APIErrorProvider';
-import { config } from './config';
-
 
 import './ProductThumbnail.scss';
 
@@ -35,7 +33,7 @@ export const ProductThumbnail: React.FC<ProductThumbnailProps> = (props) => {
         addError(error.errors);
       }
     },
-    [props.product, addError]
+    [priceBookId, props.product, addError]
   );
 
   return (

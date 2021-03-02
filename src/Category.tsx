@@ -7,7 +7,6 @@ import { ProductThumbnail } from './ProductThumbnail';
 import { createCategoryUrl } from './routes';
 import { Pagination } from './Pagination';
 import { useResolve } from './hooks';
-import { config } from './config';
 
 import './Category.scss';
 
