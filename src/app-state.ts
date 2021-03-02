@@ -5,6 +5,7 @@ import {
   getCustomer,
   getAddresses,
   getAllOrders,
+  loadCategoryChildren,
   loadCategoryTree,
   getCartItems,
   loadEnabledCurrencies,
@@ -342,6 +343,32 @@ function useCategoriesState(selectedLanguage: string) {
   };
 }
 
+function useCategoriesNodeState() {
+  const [categoryPaths, setCategoryPaths] = useState<any>();
+  const [categoriesTree, setCategoriesTree] = useState<any>();
+  useEffect(() => {
+    setCategoryPaths(undefined);
+    setCategoriesTree(undefined);
+
+    loadCategoryChildren(config.hierarchyId).then(result => {
+      setCategoriesTree(result);
+      const paths:any[] = [];
+      result.data.forEach(element => {
+        paths.push(element)
+      })
+      setCategoryPaths(paths);
+    });
+
+  }, []);
+  const categoryPathBySlug = (slug: string) => {
+    return categoryPaths?.["attributes"]?.[slug];
+  };
+  return {
+    categoriesTree,
+    categoryPathBySlug,
+  };
+}
+
 function useCompareProductsState() {
   const [compareProducts, setCompareProducts] = useState<moltin.Product[]>([]);
   const [showCompareMenu, setShowCompareMenu] = useState(false);
@@ -581,8 +608,7 @@ function useGlobalState() {
     cartData,
     multiCartData,
     currency,
-    priceBookData,
-    categories: useCategoriesState(translation.selectedLanguage),
+    categories: useCategoriesNodeState(),
     compareProducts: useCompareProductsState(),
     authenticationSettings: useCustomerAuthenticationSettingsState(),
   };

@@ -6,6 +6,7 @@ const MoltinGateway = moltin.gateway;
 export async function loadCustomerAuthenticationSettings(): Promise<any> {
   const moltin = MoltinGateway({
     client_id: config.clientId,
+    client_secret: config.clientSecret,
     host: config.endpointURL,
   });
   return moltin.AuthenticationSettings.Get()
@@ -289,4 +290,11 @@ export async function getPriceBookPrice(priceBookId: string, sku: string) {
   await moltin.Authenticate();
   const result = await moltin.request.send(`pricebooks/${priceBookId}/prices?filter=eq(sku,${sku})`, 'GET');
   return result.data.length > 0 && result.data[0];
+}
+
+export async function loadCategoryChildren(hierarchyId: string) : Promise<moltin.ResourceList<moltin.Node>>{
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret });
+  await moltin.Authenticate();
+  const result = await moltin.Hierarchies.Children(hierarchyId);
+  return result;
 }

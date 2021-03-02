@@ -2,6 +2,7 @@
 export const config = {
   clientId: process.env.REACT_APP_CLIENT_ID || 'PvkeyEKaMppVoUZSddCFZt8pGuRxgD8YR7xW5HmKgQ',
   clientSecret: 'placeholder',
+  hierarchyId: '44b094ea-e58b-4f38-9c24-e548f11d7c7e',
   stripeKey: process.env.REACT_APP_STRIPE_KEY || 'pk_test_YknKfRnn0FyonEJnRe4RClIp00k5zLjbOG',
   categoryPageSize: 8,
   maxCompareProducts: 4,
