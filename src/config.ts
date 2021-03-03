@@ -1,8 +1,7 @@
 
 export const config = {
-  clientId: process.env.REACT_APP_CLIENT_ID || 'PvkeyEKaMppVoUZSddCFZt8pGuRxgD8YR7xW5HmKgQ',
+  clientId: process.env.REACT_APP_CLIENT_ID || '8WPbd15xBRQiX84I5YH21ffwLfpdLfFLGPBissIoeb',
   clientSecret: 'placeholder',
-  catalogId: '38803ab1-e1e0-4606-b96b-4db779b1f436',
   stripeKey: process.env.REACT_APP_STRIPE_KEY || 'pk_test_YknKfRnn0FyonEJnRe4RClIp00k5zLjbOG',
   categoryPageSize: 8,
   maxCompareProducts: 4,

@@ -30,7 +30,7 @@ interface RouteConfig {
 
 export const routes: RouteConfig[] = [
   { exact: true, path: '/', component: Home, },
-  { exact: true, path: '/category/:categorySlug/:pageNum?', component: Category, },
+  { exact: true, path: '/category/:categoryId/:pageNum?', component: Category, },
   { exact: true, path: '/product/:productSlug', component: Product, },
   { exact: true, path: '/aboutus', component: AboutUs, },
   { exact: true, path: '/contactus', component: ContactUs, },
@@ -63,8 +63,8 @@ export function createHomeUrl(): string {
   return '/';
 }
 
-export function createCategoryUrl(categorySlug: string, pageNum?: number): string {
-  return `/category/${categorySlug}${pageNum && pageNum > 1 ? `/${pageNum}` : ''}`;
+export function createCategoryUrl(categoryId: string, pageNum?: number): string {
+  return `/category/${categoryId}${pageNum && pageNum > 1 ? `/${pageNum}` : ''}`;
 }
 
 export function createProductUrl(productSlug: string): string {

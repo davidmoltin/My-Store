@@ -15,6 +15,7 @@ import {
   addCustomerAssociation,
   loadCustomerAuthenticationSettings,
   loadOidcProfiles,
+  getReleaseData,
   getCatalogData,
   getHierarchyId,
 } from './service';
@@ -304,21 +305,17 @@ function useCurrencyState() {
 function getCategoryPaths(categories: moltin.Node[]): { [categoryId: string]: moltin.Node[] } {
   const lastCat = categories[categories.length - 1];
 
-  if (lastCat.attributes.slug) {
-    let map: { [categoryId: string]: moltin.Node[] } = {
-      [lastCat.attributes.slug]: [...categories]
-    };
+  let map: { [categoryId: string]: moltin.Node[] } = {
+    [lastCat.id]: [...categories]
+  };
 
-    const childCats = lastCat.relationships.children.data ?? [];
+  const childCats = lastCat.relationships.children.data ?? [];
 
-    for (const child of childCats) {
-      map = { ...map, ...getCategoryPaths([...categories, child]) };
-    }
-
-    return map;
+  for (const child of childCats) {
+    map = { ...map, ...getCategoryPaths([...categories, child]) };
   }
 
-  return {};
+  return map;
 }
 
 function mergeMaps(tree: moltin.Node[]): { [categoryId: string]: moltin.Node[] } {
@@ -362,12 +359,12 @@ function useCategoriesNodeState(hierarchyId: string) {
       });
     }
   }, [hierarchyId]);
-  const categoryPathBySlug = (slug: string) => {
-    return categoryPaths?.[slug];
+  const categoryPathById = (id: string) => {
+    return categoryPaths?.[id];
   };
   return {
     categoriesTree,
-    categoryPathBySlug,
+    categoryPathById,
   };
 }
 
@@ -586,10 +583,10 @@ function useCatalogDataState() {
   const [categoryHierarchyId, setCategoryHierarchyId] = useState('');
 
   useEffect(() => {
-    getCatalogData(config.catalogId).then(res => {
-      setPriceBookId(res.data.attributes.pricebook_id);
-      getHierarchyId(res.data.attributes.hierarchy_ids, 'categories').then(res => {
-        setCategoryHierarchyId(res);
+    getReleaseData().then(res => {
+      getCatalogData(res.data.id).then(res => {
+        setPriceBookId(res.data.attributes.pricebook_id);
+        setCategoryHierarchyId(res.data.attributes.hierarchy_ids[0]);
       });
     });
   }, []);

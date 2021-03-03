@@ -32,7 +32,7 @@ export const NavMenu: React.FC<NavMenuProps> = (props) => {
               <Link
                 onClick={handleCloseMenu}
                 className={`navmenu__link ${category.relationships?.children?.data.length > 0 ? '--haschildren' : ''}`}
-                to={createCategoryUrl(category.attributes?.slug)}
+                to={createCategoryUrl(category.id)}
               >
                 {category.attributes?.name}
               </Link>

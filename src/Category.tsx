@@ -35,15 +35,16 @@ function useCategoryProducts(categoryId: string | undefined, pageNum: number) {
 }
 
 interface CategoryParams {
-  categorySlug: string;
+  categoryId: string;
   pageNum?: string;
 }
 
 export const Category: React.FC = () => {
   const params = useParams<CategoryParams>();
-  const categorySlug = params.categorySlug;
-  const { categoryPathBySlug } = useCategories();
-  const categoryPath = categoryPathBySlug(categorySlug);
+  console.log(params);
+  const categoryId = params.categoryId;
+  const { categoryPathById } = useCategories();
+  const categoryPath = categoryPathById(categoryId);
   const category = categoryPath?.[categoryPath?.length - 1];
   const parsedPageNum = parseInt(params.pageNum!);
   const pageNum = isNaN(parsedPageNum) ? 1 : parsedPageNum;
@@ -60,7 +61,7 @@ export const Category: React.FC = () => {
                 {index > 0 && (
                   <span className="category__breadcrumbseparator">{'>'}</span>
                 )}
-                <a className="category__breadcrumblink" href={createCategoryUrl(category.attributes.slug || '')}>{category.attributes.name}</a>
+                <a className="category__breadcrumblink" href={createCategoryUrl(category.id || '')}>{category.attributes.name}</a>
               </React.Fragment>
             ))}
           </div>
@@ -80,7 +81,7 @@ export const Category: React.FC = () => {
               <Pagination
                 totalPages={totalPages}
                 currentPage={pageNum}
-                formatUrl={(page) => createCategoryUrl(categorySlug, page)}
+                formatUrl={(page) => createCategoryUrl(categoryId, page)}
               />
             )}
           </div>
