@@ -28,16 +28,16 @@ export const NavMenu: React.FC<NavMenuProps> = (props) => {
     return (
       <ul className={`navmenu__sub --level-${level} ${isVisible ? '--show' : ''}`}>
         {categories?.data.map((category: any={}) => (
-          <li key={category.attributes.id} className="navmenu__li">
+          <li key={category.id} className="navmenu__li">
               <Link
                 onClick={handleCloseMenu}
-                className={`navmenu__link ${category.children ? '--haschildren' : ''}`}
-                to={createCategoryUrl(category.attributes.slug)}
+                className={`navmenu__link ${category.relationships?.children?.data.length > 0 ? '--haschildren' : ''}`}
+                to={createCategoryUrl(category.attributes?.slug)}
               >
-                {category.attributes.name}
+                {category.attributes?.name}
               </Link>
-              <button type="button" className={`navmenu__nextbutton ${category.children ? '--haschildren' : ''}`} onClick={() => handleShow(category)} />
-            {category.children && renderCategories(category.children, level + 1, categoryHistory.includes(category.id))}
+              <button type="button" className={`navmenu__nextbutton ${category.relationships?.children?.data.length > 0 ? '--haschildren' : ''}`} onClick={() => handleShow(category)} />
+            {category.relationships?.children?.data.length > 0 && renderCategories(category.relationships?.children, level + 1, categoryHistory.includes(category.id))}
           </li>
         ))}
       </ul>
