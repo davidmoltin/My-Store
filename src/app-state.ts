@@ -580,7 +580,6 @@ function useMultiCartDataState() {
 function useCatalogDataState() {
   const [releaseId, setReleaseId] = useState('');
   const [catalogId, setCatalogId] = useState('');
-  const [priceBookId, setPriceBookId] = useState('');
   const [categoryHierarchyId, setCategoryHierarchyId] = useState('');
 
   useEffect(() => {
@@ -588,7 +587,6 @@ function useCatalogDataState() {
       setReleaseId(res.data.id);
       getCatalogData(res.data.id).then(res => {
         setCatalogId(res.data.id);
-        setPriceBookId(res.data.attributes.pricebook_id);
         setCategoryHierarchyId(res.data.attributes.hierarchy_ids[0]);
       });
     });
@@ -596,7 +594,6 @@ function useCatalogDataState() {
   return {
     releaseId,
     catalogId,
-    priceBookId,
     categoryHierarchyId,
   }
 }
