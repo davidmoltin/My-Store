@@ -56,10 +56,10 @@ function getProductCache(key: string, language: string, currency: string): molti
   return productCache[`${key}:${language}:${currency}`];
 }
 
-export async function loadCategoryProducts(hierarchyId: string, categoryId: string, pageNum: number, language: string, currency: string): Promise<moltin.Resource<moltin.PcmProduct[]>> {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret, language, currency});
-  await moltin.Authenticate();
-  const result = await moltin.Hierarchies.Relationships.Products({hierarchyId: hierarchyId, nodeId: categoryId});
+export async function loadCategoryProducts(catalogId: string, releaseId: string, categoryId: string, pageNum: number, language: string, currency: string): Promise<moltin.Resource<moltin.PcmProduct[]>> {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency});
+  moltin.config.version = 'experimental';
+  const result = await moltin.request.send(`catalogs/${catalogId}/releases/${releaseId}/nodes/${categoryId}/relationships/products`, 'GET');
 
   for (const product of result.data) {
     setProductCache(product.id, language, currency, product as any as moltin.PcmProduct);
@@ -98,7 +98,7 @@ export async function loadImageHref(imageId: string): Promise<string | undefined
   return result.data.link.href;
 }
 
-export async function loadProductBySlug(productSlug: string, language: string, currency: string): Promise<moltin.PcmProduct> {
+export async function loadProductBySlug(catalogId: string, releaseId: string, productSlug: string, language: string, currency: string) {
   const cachedProduct = getProductCache(productSlug, language, currency);
 
   if (cachedProduct) {
@@ -106,19 +106,11 @@ export async function loadProductBySlug(productSlug: string, language: string, c
   }
 
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency });
+  moltin.config.version = 'experimental';
 
-  const resultSlug = await moltin.PCM
-    .Limit(1)
-    .Filter({
-      eq: {
-        slug: productSlug
-      }
-    })
-    .All();
+  const result = await moltin.request.send(`catalogs/${catalogId}/releases/${releaseId}/products?filter=eq(slug,${productSlug})`, 'GET');
 
-  const productId = resultSlug?.data[0]?.id;
-  const result = await moltin.PCM.Get(productId);
-  const product = result.data;
+  const product = result.data.length > 0 && result.data[0];
 
   setProductCache(product.attributes.slug, language, currency, product);
 
@@ -282,14 +274,6 @@ export async function addCustomerAssociation(cartId: string, customerId: string,
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId });
   const result = await moltin.Cart(cartId).AddCustomerAssociation(customerId, token);
   return result;
-}
-
-export async function getPriceBookPrice(priceBookId: string, sku: string) {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, client_secret: config.clientSecret });
-  moltin.config.version = 'experimental';
-  await moltin.Authenticate();
-  const result = await moltin.request.send(`pricebooks/${priceBookId}/prices?filter=eq(sku,${sku})`, 'GET');
-  return result.data.length > 0 && result.data[0];
 }
 
 export async function loadCategoryChildren(hierarchyId: string) : Promise<moltin.ResourceList<moltin.Node>>{

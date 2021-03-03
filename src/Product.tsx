@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import useOnclickOutside from 'react-cool-onclickoutside';
 import { useResolve, useProductImages } from './hooks';
-import { addToCart, loadProductBySlug, getPriceBookPrice } from './service';
+import { addToCart, loadProductBySlug } from './service';
 import { CompareCheck } from './CompareCheck';
 import { SocialShare } from './SocialShare';
 import {
@@ -39,7 +39,7 @@ export const Product: React.FC = () => {
   const { updateCartItems, setCartQuantity, handleShowCartPopup } = useCartData();
   const { isLoggedIn } = useCustomerData();
   const { multiCartData, updateCartData, updateSelectedCart, setIsCartSelected } = useMultiCartData();
-  const { priceBookId } = useCatalog();
+  const { catalogId, releaseId } = useCatalog();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -57,25 +57,14 @@ export const Product: React.FC = () => {
   const [product] = useResolve(
     async () => {
       try {
-        return loadProductBySlug(productSlug, selectedLanguage, selectedCurrency)
+        return catalogId !== '' && releaseId !== '' && productSlug !== '' && loadProductBySlug(catalogId, releaseId, productSlug, selectedLanguage, selectedCurrency)
       } catch (error) {
         addError(error.errors);
       }
     },
-    [productSlug, selectedLanguage, selectedCurrency, addError]
+    [catalogId, releaseId, productSlug, selectedLanguage, selectedCurrency, addError]
   );
   const [productId, setProductId] = useState('');
-
-  const [price] = useResolve(
-    async () => {
-      try {
-        return product && getPriceBookPrice(priceBookId, product.attributes.sku);
-      } catch (error) {
-        addError(error.errors);
-      }
-    },
-    [priceBookId, product, addError]
-  );
 
   useEffect(() => {
     product && setProductId(product.id);
@@ -106,8 +95,10 @@ export const Product: React.FC = () => {
         } else {
           updateCartItems();
         }
-        if (isLoggedIn) setIsCartSelected(true);
-        updateCartData();
+        if (isLoggedIn) {
+          setIsCartSelected(true);
+          updateCartData();
+        }
         setCartQuantity(1);
         handleShowCartPopup();
       }).finally(() => {
@@ -236,17 +227,16 @@ export const Product: React.FC = () => {
               {product.attributes.sku}
             </div>
             <div className="product__price">
-            {price && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format(price.attributes.currencies[selectedCurrency].amount/100)}
-            </div>
+            {product.attributes.price && product.attributes.price[selectedCurrency] && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format(product.attributes.price[selectedCurrency].amount/100)}            </div>
             {/* <Availability available={isProductAvailable(product)} />
             <div className="product__comparecheck">
               <CompareCheck product={product} />
-            </div>
+            </div> */}
             {
               product.meta.variations
                 ? <VariationsSelector product={product} onChange={handleVariationChange} />
                 : ''
-            } */}
+            }
             <div className="product__moltinbtncontainer">
               <div ref={dropdownRef}>
                 <CartButton/>

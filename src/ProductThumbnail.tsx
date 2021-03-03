@@ -7,8 +7,7 @@ import { CompareCheck } from './CompareCheck';
 import { ProductMainImage } from './ProductMainImage';
 import { isProductAvailable } from './helper';
 import { Availability } from './Availability';
-import { useCurrency, useTranslation, useCatalog } from './app-state';
-import { getPriceBookPrice } from './service';
+import { useCurrency, useTranslation } from './app-state';
 import { APIErrorContext } from './APIErrorProvider';
 
 import './ProductThumbnail.scss';
@@ -22,19 +21,6 @@ export const ProductThumbnail: React.FC<ProductThumbnailProps> = (props) => {
   const productUrl = createProductUrl(props.product.attributes.slug);
   const { selectedCurrency } = useCurrency();
   const { selectedLanguage } = useTranslation();
-  const { priceBookId } = useCatalog();
-  const { addError } = useContext(APIErrorContext);
-
-  const [price] = useResolve(
-    async () => {
-      try {
-        return getPriceBookPrice(priceBookId, props.product.attributes.sku);
-      } catch (error) {
-        addError(error.errors);
-      }
-    },
-    [priceBookId, props.product, addError]
-  );
 
   return (
     <div className="productthumbnail">
@@ -52,7 +38,7 @@ export const ProductThumbnail: React.FC<ProductThumbnailProps> = (props) => {
         {props.product.attributes.sku}
       </div>
       <div className="productthumbnail__price">
-        {price && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format(price.attributes.currencies[selectedCurrency].amount/100)}
+        {props.product.attributes.price && props.product.attributes.price[selectedCurrency] && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format(props.product.attributes.price[selectedCurrency].amount/100)}
       </div>
       {/* <Availability available={isProductAvailable(props.product)}/>
       <div className={`productthumbnail__comparecheck`}>

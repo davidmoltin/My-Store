@@ -17,7 +17,6 @@ import {
   loadOidcProfiles,
   getReleaseData,
   getCatalogData,
-  getHierarchyId,
 } from './service';
 
 import { config } from './config';
@@ -579,18 +578,24 @@ function useMultiCartDataState() {
 }
 
 function useCatalogDataState() {
+  const [releaseId, setReleaseId] = useState('');
+  const [catalogId, setCatalogId] = useState('');
   const [priceBookId, setPriceBookId] = useState('');
   const [categoryHierarchyId, setCategoryHierarchyId] = useState('');
 
   useEffect(() => {
     getReleaseData().then(res => {
+      setReleaseId(res.data.id);
       getCatalogData(res.data.id).then(res => {
+        setCatalogId(res.data.id);
         setPriceBookId(res.data.attributes.pricebook_id);
         setCategoryHierarchyId(res.data.attributes.hierarchy_ids[0]);
       });
     });
   }, []);
   return {
+    releaseId,
+    catalogId,
     priceBookId,
     categoryHierarchyId,
   }
