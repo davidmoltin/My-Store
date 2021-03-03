@@ -41,7 +41,6 @@ interface CategoryParams {
 
 export const Category: React.FC = () => {
   const params = useParams<CategoryParams>();
-  console.log(params);
   const categoryId = params.categoryId;
   const { categoryPathById } = useCategories();
   const categoryPath = categoryPathById(categoryId);
