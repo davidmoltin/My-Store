@@ -307,18 +307,18 @@ function getCategoryPaths(categories: moltin.Node[]): { [categoryId: string]: mo
   if (lastCat.attributes.slug) {
     let map: { [categoryId: string]: moltin.Node[] } = {
       [lastCat.attributes.slug]: [...categories]
-  };
+    };
 
-  const childCats = lastCat.relationships.children.data ?? [];
+    const childCats = lastCat.relationships.children.data ?? [];
 
-  for (const child of childCats) {
-    map = { ...map, ...getCategoryPaths([...categories, child]) };
+    for (const child of childCats) {
+      map = { ...map, ...getCategoryPaths([...categories, child]) };
+    }
+
+    return map;
   }
 
-  return map;
-}
-
-return {};
+  return {};
 }
 
 function mergeMaps(tree: moltin.Node[]): { [categoryId: string]: moltin.Node[] } {
@@ -356,18 +356,8 @@ function useCategoriesNodeState(hierarchyId: string) {
     setCategoryPaths(undefined);
     setCategoriesTree(undefined);
     if (hierarchyId) {
-      let response:any = {}
       loadCategoryChildren(hierarchyId).then(result => {
-        response = result;
-        for (let i = 0; i < result.data.length; i++) {
-          const hierarchyId = result.data[i].relationships.children.links.related.split('/')[4];
-          loadCategoryChildren(hierarchyId).then(result => {
-            if (result.data.length !== 0) {
-              response.data[i].relationships.children.data = result.data;
-            }
-          }).catch((err) => console.error(err));
-        };
-        setCategoriesTree(response);
+        setCategoriesTree(result);
         setCategoryPaths(mergeMaps(result.data));
       });
     }
