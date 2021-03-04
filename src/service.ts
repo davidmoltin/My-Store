@@ -296,8 +296,12 @@ export async function loadCategoryChildren(hierarchyId: string) : Promise<moltin
   return hierarchyChildren;
 }
 
-export async function getReleaseData() {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId });
+export async function getReleaseData(customerId: string, channel: string = '', tag: string = '') {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
+    'X-Moltin-Channel': channel,
+    'X-Moltin-Auth-User': customerId,
+    'X-Moltin-Tag': tag
+  } });
   moltin.config.version = 'experimental';
   const result = await moltin.request.send('catalog', 'GET');
   return result;
