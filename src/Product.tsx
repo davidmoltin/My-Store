@@ -135,6 +135,7 @@ export const Product: React.FC = () => {
             <button
               className="epbtn --primary product__addtocartbtn"
               onClick={handleAddToDefaultCart}
+              disabled={!(product.attributes.price && product.attributes.price[selectedCurrency])}
             >
               {t("add-to-cart")}
               {' - '}
@@ -142,7 +143,7 @@ export const Product: React.FC = () => {
             </button>
             <button onClick={() => setDropdownOpen(!dropdownOpen)} className={`epbtn --primary product__addtocartdropdowntoggle${
               dropdownOpen ? " --open" : ""
-            }`}>
+            }`} disabled={!(product.attributes.price && product.attributes.price[selectedCurrency])}>
               {addToCartLoading ? (
                 <SpinnerIcon className="product__addtocartdropdownicspinner" />
               ) : (
@@ -179,7 +180,7 @@ export const Product: React.FC = () => {
     }
 
     return (
-      <button className="epbtn --secondary" onClick={() => handleAddToCart()}>
+      <button className="epbtn --secondary" onClick={() => handleAddToCart()} disabled={!(product.attributes.price && product.attributes.price[selectedCurrency])}>
         {t("add-to-cart")}
       </button>
     );
