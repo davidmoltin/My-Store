@@ -6,7 +6,6 @@ import {
   getAddresses,
   getAllOrders,
   loadCategoryChildren,
-  loadCategoryTree,
   getCartItems,
   loadEnabledCurrencies,
   getMultiCarts,
@@ -308,7 +307,7 @@ function getCategoryPaths(categories: moltin.Node[]): { [categoryId: string]: mo
     [lastCat.id]: [...categories]
   };
 
-  const childCats = lastCat.relationships.children.data ?? [];
+  const childCats = lastCat.relationships?.children?.data ?? [];
 
   for (const child of childCats) {
     map = { ...map, ...getCategoryPaths([...categories, child]) };
@@ -320,30 +319,6 @@ function getCategoryPaths(categories: moltin.Node[]): { [categoryId: string]: mo
 function mergeMaps(tree: moltin.Node[]): { [categoryId: string]: moltin.Node[] } {
   return tree.reduce((acc, c) => ({ ...acc, ...getCategoryPaths([c]) }), {});
 }
-
-// function useCategoriesState(selectedLanguage: string) {
-//   const [categoryPaths, setCategoryPaths] = useState<{ [categoryId: string]: moltin.Category[] }>();
-//   const [categoriesTree, setCategoriesTree] = useState<moltin.Category[]>();
-
-//   useEffect(() => {
-//     setCategoryPaths(undefined);
-//     setCategoriesTree(undefined);
-
-//     loadCategoryTree(selectedLanguage).then(result => {
-//       setCategoriesTree(result);
-//       setCategoryPaths(mergeMaps(result));
-//     }).catch(err=>console.error(err));
-//   }, [selectedLanguage]);
-
-//   const categoryPathBySlug = (slug: string) => {
-//     return categoryPaths?.[slug];
-//   };
-
-//   return {
-//     categoriesTree,
-//     categoryPathBySlug,
-//   };
-// }
 
 function useCategoriesNodeState(hierarchyId: string) {
   const [categoryPaths, setCategoryPaths] = useState<any>();

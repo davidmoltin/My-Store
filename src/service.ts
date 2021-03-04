@@ -282,10 +282,17 @@ export async function loadCategoryChildren(hierarchyId: string) : Promise<moltin
   const hierarchyChildren = await moltin.Hierarchies.Children(hierarchyId);
   const grandChildrenPromises = hierarchyChildren.data.map((child: moltin.Node) => moltin.Hierarchies.Children(child.id));
   const grandChildren: moltin.ResourceList<moltin.Node>[] = await Promise.all(grandChildrenPromises);
-  hierarchyChildren.data =  hierarchyChildren.data.map((child: any, index: number) => {
+  const hierarchyPromises = hierarchyChildren.data.map(async(child: any, index: number) => {
+    const greatGrandChildrenPromises = grandChildren[index].data.map((child: moltin.Node) => moltin.Hierarchies.Children(child.id));
+    const greatGrandChildren: any[] = await Promise.all(greatGrandChildrenPromises);
+    grandChildren[index].data = grandChildren[index].data.map((grandChild: moltin.Node, idx: number) => {
+      grandChild.relationships.children.data = greatGrandChildren[idx].data;
+      return grandChild;
+    });
     child.relationships.children.data = grandChildren[index].data;
     return child;
   });
+  hierarchyChildren.data = await Promise.all(hierarchyPromises);
   return hierarchyChildren;
 }
 
