@@ -552,20 +552,20 @@ function useMultiCartDataState() {
   }
 }
 
-function useCatalogDataState() {
+function useCatalogDataState(customerId: string = '') {
   const [releaseId, setReleaseId] = useState('');
   const [catalogId, setCatalogId] = useState('');
   const [categoryHierarchyId, setCategoryHierarchyId] = useState('');
 
   useEffect(() => {
-    getReleaseData().then(res => {
+    getReleaseData(customerId).then(res => {
       setReleaseId(res.data.id);
       getCatalogData(res.data.id).then(res => {
         setCatalogId(res.data.id);
         setCategoryHierarchyId(res.data.attributes.hierarchy_ids[0]);
       });
     });
-  }, []);
+  }, [customerId]);
   return {
     releaseId,
     catalogId,
@@ -580,11 +580,12 @@ function useGlobalState() {
   const ordersData = usePurchaseHistoryState();
   const cartData = useCartItemsState();
   const multiCartData = useMultiCartDataState();
-  const catalogData = useCatalogDataState();
+  const customerData = useCustomerDataState();
+  const catalogData = useCatalogDataState(customerData.id);
 
   return {
     translation,
-    customerData: useCustomerDataState(),
+    customerData,
     addressData,
     ordersData,
     cartData,
