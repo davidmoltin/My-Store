@@ -55,8 +55,10 @@ function getProductCache(key: string, language: string, currency: string): molti
   return productCache[`${key}:${language}:${currency}`];
 }
 
-export async function loadCategoryProducts(categoryId: string, pageNum: number, language: string, currency: string): Promise<moltin.Resource<moltin.PcmProduct[]>> {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency});
+export async function loadCategoryProducts(categoryId: string, pageNum: number, language: string, currency: string, customerToken: string): Promise<moltin.Resource<moltin.PcmProduct[]>> {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency, headers: {
+    'X-Moltin-Customer-Token': customerToken,
+  }});
   moltin.config.version = 'experimental';
   const result = await moltin.request.send(`catalog/nodes/${categoryId}/relationships/products`, 'GET');
 
@@ -97,14 +99,16 @@ export async function loadImageHref(imageId: string): Promise<string | undefined
   return result.data.link.href;
 }
 
-export async function loadProductBySlug(productSlug: string, language: string, currency: string) {
+export async function loadProductBySlug(productSlug: string, language: string, currency: string, customerToken: string) {
   const cachedProduct = getProductCache(productSlug, language, currency);
 
   if (cachedProduct) {
     return cachedProduct;
   }
 
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency });
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency, headers: {
+    'X-Moltin-Customer-Token': customerToken,
+  } });
   moltin.config.version = 'experimental';
 
   const result = await moltin.request.send(`catalog/products?filter=eq(slug,${productSlug})`, 'GET');
@@ -275,8 +279,10 @@ export async function addCustomerAssociation(cartId: string, customerId: string,
   return result;
 }
 
-export async function loadCategoryChildren(hierarchyId: string) : Promise<moltin.ResourceList<moltin.Node>>{
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId });
+export async function loadCategoryChildren(hierarchyId: string, customerToken: string) : Promise<moltin.ResourceList<moltin.Node>>{
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
+    'X-Moltin-Customer-Token': customerToken,
+  }  });
   moltin.config.version = 'experimental';
   const hierarchyChildren = await moltin.request.send(`catalog/nodes/${hierarchyId}/relationships/children`, 'GET');
   const grandChildrenPromises = hierarchyChildren.data.map((child: moltin.Node) => moltin.request.send(`catalog/nodes/${child.id}/relationships/children`, 'GET'));

@@ -319,19 +319,19 @@ function mergeMaps(tree: moltin.Node[]): { [categoryId: string]: moltin.Node[] }
   return tree.reduce((acc, c) => ({ ...acc, ...getCategoryPaths([c]) }), {});
 }
 
-function useCategoriesNodeState(releaseData: any) {
+function useCategoriesNodeState(releaseData: any, customerToken: string) {
   const [categoryPaths, setCategoryPaths] = useState<any>();
   const [categoriesTree, setCategoriesTree] = useState<any>();
   useEffect(() => {
     setCategoryPaths(undefined);
     setCategoriesTree(undefined);
     if (releaseData) {
-      loadCategoryChildren(releaseData.attributes.hierarchies[0].id).then(result => {
+      loadCategoryChildren(releaseData.attributes.hierarchies[0].id, customerToken).then(result => {
         setCategoriesTree(result);
         setCategoryPaths(mergeMaps(result.data));
       });
     }
-  }, [releaseData]);
+  }, [releaseData, customerToken]);
   const categoryPathById = (id: string) => {
     return categoryPaths?.[id];
   };
@@ -583,7 +583,7 @@ function useGlobalState() {
     multiCartData,
     currency,
     releaseData,
-    categories: useCategoriesNodeState(releaseData.releaseData),
+    categories: useCategoriesNodeState(releaseData.releaseData, customerData.token),
     compareProducts: useCompareProductsState(),
     authenticationSettings: useCustomerAuthenticationSettingsState(),
   };

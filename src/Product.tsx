@@ -36,7 +36,7 @@ export const Product: React.FC = () => {
   const { selectedLanguage } = useTranslation();
   const { selectedCurrency } = useCurrency();
   const { updateCartItems, setCartQuantity, handleShowCartPopup } = useCartData();
-  const { isLoggedIn } = useCustomerData();
+  const { isLoggedIn, token } = useCustomerData();
   const { multiCartData, updateCartData, updateSelectedCart, setIsCartSelected } = useMultiCartData();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -55,12 +55,12 @@ export const Product: React.FC = () => {
   const [product] = useResolve(
     async () => {
       try {
-        return productSlug !== '' && loadProductBySlug(productSlug, selectedLanguage, selectedCurrency)
+        return productSlug !== '' && loadProductBySlug(productSlug, selectedLanguage, selectedCurrency, token)
       } catch (error) {
         addError(error.errors);
       }
     },
-    [productSlug, selectedLanguage, selectedCurrency, addError]
+    [productSlug, selectedLanguage, selectedCurrency, addError, token]
   );
   const [productId, setProductId] = useState('');
 
