@@ -15,7 +15,6 @@ import {
   loadCustomerAuthenticationSettings,
   loadOidcProfiles,
   getReleaseData,
-  getCatalogData,
 } from './service';
 
 import { config } from './config';
@@ -320,19 +319,19 @@ function mergeMaps(tree: moltin.Node[]): { [categoryId: string]: moltin.Node[] }
   return tree.reduce((acc, c) => ({ ...acc, ...getCategoryPaths([c]) }), {});
 }
 
-function useCategoriesNodeState(hierarchyId: string) {
+function useCategoriesNodeState(releaseData: any) {
   const [categoryPaths, setCategoryPaths] = useState<any>();
   const [categoriesTree, setCategoriesTree] = useState<any>();
   useEffect(() => {
     setCategoryPaths(undefined);
     setCategoriesTree(undefined);
-    if (hierarchyId) {
-      loadCategoryChildren(hierarchyId).then(result => {
+    if (releaseData) {
+      loadCategoryChildren(releaseData.attributes.hierarchies[0].id).then(result => {
         setCategoriesTree(result);
         setCategoryPaths(mergeMaps(result.data));
       });
     }
-  }, [hierarchyId]);
+  }, [releaseData]);
   const categoryPathById = (id: string) => {
     return categoryPaths?.[id];
   };
@@ -552,24 +551,16 @@ function useMultiCartDataState() {
   }
 }
 
-function useCatalogDataState(customerId: string = '') {
-  const [releaseId, setReleaseId] = useState('');
-  const [catalogId, setCatalogId] = useState('');
-  const [categoryHierarchyId, setCategoryHierarchyId] = useState('');
+function useReleaseDataState(customerToken: string = '') {
+  const [releaseData, setReleaseData] = useState<any>();
 
   useEffect(() => {
-    getReleaseData(customerId).then(res => {
-      setReleaseId(res.data.id);
-      getCatalogData(res.data.id).then(res => {
-        setCatalogId(res.data.id);
-        setCategoryHierarchyId(res.data.attributes.hierarchy_ids[0]);
-      });
+    getReleaseData(customerToken).then(res => {
+      setReleaseData(res.data);
     });
-  }, [customerId]);
+  }, [customerToken]);
   return {
-    releaseId,
-    catalogId,
-    categoryHierarchyId,
+    releaseData
   }
 }
 
@@ -581,7 +572,7 @@ function useGlobalState() {
   const cartData = useCartItemsState();
   const multiCartData = useMultiCartDataState();
   const customerData = useCustomerDataState();
-  const catalogData = useCatalogDataState(customerData.id);
+  const releaseData = useReleaseDataState(customerData.token);
 
   return {
     translation,
@@ -591,8 +582,8 @@ function useGlobalState() {
     cartData,
     multiCartData,
     currency,
-    catalogData,
-    categories: useCategoriesNodeState(catalogData.categoryHierarchyId),
+    releaseData,
+    categories: useCategoriesNodeState(releaseData.releaseData),
     compareProducts: useCompareProductsState(),
     authenticationSettings: useCustomerAuthenticationSettingsState(),
   };
@@ -605,7 +596,7 @@ export const [
   useAddressData,
   useOrdersData,
   useCurrency,
-  useCatalog,
+  useRelease,
   useCategories,
   useCompareProducts,
   useCustomerAuthenticationSettings,
@@ -618,7 +609,7 @@ export const [
   value => value.addressData,
   value => value.ordersData,
   value => value.currency,
-  value => value.catalogData,
+  value => value.releaseData,
   value => value.categories,
   value => value.compareProducts,
   value => value.authenticationSettings,

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import * as moltin from '@moltin/sdk';
 import { loadCategoryProducts } from './service';
-import { useCategories, useTranslation, useCurrency, useCatalog } from './app-state';
+import { useCategories, useTranslation, useCurrency } from './app-state';
 import { ProductThumbnail } from './ProductThumbnail';
 import { createCategoryUrl } from './routes';
 import { Pagination } from './Pagination';
@@ -13,7 +13,6 @@ import './Category.scss';
 function useCategoryProducts(categoryId: string | undefined, pageNum: number) {
   const { selectedLanguage } = useTranslation();
   const { selectedCurrency } = useCurrency();
-  const { catalogId, releaseId } = useCatalog();
 
   const [totalPages, setTotalPages] = useState<number>();
 
@@ -25,11 +24,11 @@ function useCategoryProducts(categoryId: string | undefined, pageNum: number) {
   const [products] = useResolve(async () => {
     // during initial loading of categories categoryId might be undefined
     if (categoryId) {
-      const result = catalogId !== '' && releaseId !== '' && await loadCategoryProducts(catalogId, releaseId, categoryId, pageNum, selectedLanguage, selectedCurrency);
+      const result = await loadCategoryProducts(categoryId, pageNum, selectedLanguage, selectedCurrency);
       setTotalPages(1);
       return result;
     }
-  }, [catalogId, releaseId, categoryId, pageNum, selectedLanguage, selectedCurrency]);
+  }, [categoryId, pageNum, selectedLanguage, selectedCurrency]);
 
   return { products, totalPages };
 }
