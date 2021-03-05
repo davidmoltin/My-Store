@@ -190,9 +190,12 @@ export async function getAllOrders(token: string): Promise<{ data: moltin.Order[
   return result;
 }
 
-export async function getProductsByIds(ids: string[]): Promise<any> {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId });
-  const productsRequests = ids.map(id => moltin.Products.Get(id));
+export async function getProductsByIds(ids: string[], customerToken: string): Promise<any> {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
+    'X-Moltin-Customer-Token': customerToken,
+  } });
+  moltin.config.version = 'experimental';
+  const productsRequests = ids.map(id => moltin.request.send(`catalog/products/${id}`, 'GET'));
   const products = await Promise.all(productsRequests);
 
   return products.map(product => product.data)

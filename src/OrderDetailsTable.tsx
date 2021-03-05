@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { ProductMainImage } from "./ProductMainImage";
-import { useTranslation } from "./app-state";
+import { useTranslation, useCustomerData } from "./app-state";
 import { useResolve } from "./hooks";
 import { getProductsByIds } from "./service";
 import { APIErrorContext } from "./APIErrorProvider";
@@ -14,7 +14,7 @@ interface OrderDetailsTableParams {
 }
 
 interface OrderItemWithProductData extends moltin.OrderItem {
-  productData: moltin.Product;
+  productData: moltin.PcmProduct;
 }
 
 export const OrderDetailsTable: React.FC<OrderDetailsTableParams> = ({
@@ -23,6 +23,7 @@ export const OrderDetailsTable: React.FC<OrderDetailsTableParams> = ({
 }) => {
   const { t } = useTranslation();
   const { addError } = useContext(APIErrorContext);
+  const { token } = useCustomerData();
 
   const [products] = useResolve(async () => {
     try {
@@ -37,7 +38,7 @@ export const OrderDetailsTable: React.FC<OrderDetailsTableParams> = ({
         []
       );
 
-      const products: moltin.Product[] = await getProductsByIds(ids);
+      const products: moltin.PcmProduct[] = await getProductsByIds(ids, token);
       return orderProducts.map((item: moltin.OrderItem) => ({
         ...item,
         productData: products.find((product) => product.id === item.product_id),
@@ -45,7 +46,7 @@ export const OrderDetailsTable: React.FC<OrderDetailsTableParams> = ({
     } catch (error) {
       addError(error.errors);
     }
-  }, [orderData, addError, orderItems]);
+  }, [orderData, addError, orderItems, token]);
 
   return (
     <div className="orderdetailstable__details">
@@ -131,7 +132,7 @@ export const OrderDetailsTable: React.FC<OrderDetailsTableParams> = ({
                       <tr className="orderdetailstable__tr">
                         <td className="orderdetailstable__td">{t("name")}:</td>
                         <td className="orderdetailstable__td">
-                          <Link to={`/product/${[product.sku]}`}>
+                          <Link to={`/product/${[product.productData.attributes.slug]}`}>
                             {product.name}
                           </Link>
                         </td>
