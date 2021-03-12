@@ -282,33 +282,23 @@ export async function addCustomerAssociation(cartId: string, customerId: string,
   return result;
 }
 
-export async function loadCategoryChildren(hierarchyId: string, customerToken: string) : Promise<moltin.ResourceList<moltin.Node>>{
+export async function loadAllNodes(customerToken: string) : Promise<any[]>{
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
     'X-Moltin-Customer-Token': customerToken,
   }  });
   moltin.config.version = 'experimental';
-  const hierarchyChildren = await moltin.request.send(`catalog/nodes/${hierarchyId}/relationships/children`, 'GET');
-  const grandChildrenPromises = hierarchyChildren.data.map((child: moltin.Node) => moltin.request.send(`catalog/nodes/${child.id}/relationships/children`, 'GET'));
-  const grandChildren: moltin.ResourceList<moltin.Node>[] = await Promise.all(grandChildrenPromises);
-  const hierarchyPromises = hierarchyChildren.data.map(async(child: any, index: number) => {
-    const greatGrandChildrenPromises = grandChildren[index].data.map((child: moltin.Node) => moltin.request.send(`catalog/nodes/${child.id}/relationships/children`, 'GET'));
-    const greatGrandChildren: any[] = await Promise.all(greatGrandChildrenPromises);
-    grandChildren[index].data = grandChildren[index].data.map((grandChild: moltin.Node, idx: number) => {
-      grandChild.relationships.children.data = greatGrandChildren[idx].data;
-      return grandChild;
-    });
-    child.relationships.children.data = grandChildren[index].data;
-    return child;
-  });
-  hierarchyChildren.data = await Promise.all(hierarchyPromises);
-  return hierarchyChildren;
-}
+  const limit = 25;
+  const result = await moltin.request.send(`catalog/nodes?page[offset]=0&page[limit]=${limit}`, 'GET');
+  const lastUrl = new URL(`http://null.com${result.links.last}`);
+  const lastOffset = lastUrl.searchParams.get('page[offset]') || '0';
 
-export async function getReleaseData(customerToken: string, channel: string = '', tag: string = '') {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
-    'X-Moltin-Customer-Token': customerToken,
-  } });
-  moltin.config.version = 'experimental';
-  const result = await moltin.request.send('catalog', 'GET');
-  return result;
+  const promises = [];
+  for (let i = limit; i <= parseInt(lastOffset); i += limit) {
+    promises.push(moltin.request.send(`catalog/nodes?page[offset]=${i}&page[limit]=${limit}`, 'GET'));
+  }
+  const results = await Promise.all(promises);
+
+  const nodes = results.reduce((acc, c) => [...acc, ...c.data],[...result.data]);
+
+  return nodes;
 }
