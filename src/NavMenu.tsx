@@ -24,10 +24,10 @@ export const NavMenu: React.FC<NavMenuProps> = (props) => {
     handleCategoryClick(category.id, category.name);
   };
 
-  function renderCategories(categories: any={}, level: number = 0, isVisible: boolean = false): React.ReactElement {
+  function renderCategories(categories: any=[], level: number = 0, isVisible: boolean = false): React.ReactElement {
     return (
       <ul className={`navmenu__sub --level-${level} ${isVisible ? '--show' : ''}`}>
-        {categories?.data.map((category: any={}) => (
+        {categories?.map((category: any={}) => (
           <li key={category.id} className="navmenu__li">
               <Link
                 onClick={handleCloseMenu}
@@ -37,7 +37,7 @@ export const NavMenu: React.FC<NavMenuProps> = (props) => {
                 {category.attributes?.name}
               </Link>
               <button type="button" className={`navmenu__nextbutton ${category.relationships?.children?.data?.length > 0 ? '--haschildren' : ''}`} onClick={() => handleShow(category)} />
-            {category.relationships?.children?.data?.length > 0 && renderCategories(category.relationships?.children, level + 1, categoryHistory.includes(category.id))}
+            {category.relationships?.children?.data?.length > 0 && renderCategories(category.relationships?.children.data, level + 1, categoryHistory.includes(category.id))}
           </li>
         ))}
       </ul>

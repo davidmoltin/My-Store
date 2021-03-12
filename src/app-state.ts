@@ -5,7 +5,6 @@ import {
   getCustomer,
   getAddresses,
   getAllOrders,
-  loadCategoryChildren,
   getCartItems,
   loadEnabledCurrencies,
   getMultiCarts,
@@ -14,7 +13,7 @@ import {
   addCustomerAssociation,
   loadCustomerAuthenticationSettings,
   loadOidcProfiles,
-  getReleaseData,
+  loadAllNodes,
 } from './service';
 
 import { config } from './config';
@@ -319,19 +318,28 @@ function mergeMaps(tree: moltin.Node[]): { [categoryId: string]: moltin.Node[] }
   return tree.reduce((acc, c) => ({ ...acc, ...getCategoryPaths([c]) }), {});
 }
 
-function useCategoriesNodeState(releaseData: any, customerToken: string) {
+function getChildNodes(parentId: string, nodes: any[]) {
+  let childNodes = nodes.filter(node => node.relationships.parent && (node.relationships.parent.data.id === parentId)).map((childNode: any) => {
+    childNode.relationships.children.data = getChildNodes(childNode.id, nodes);
+    return childNode;
+  });
+
+  return childNodes;
+}
+
+function useCategoriesNodeState(customerToken: string) {
   const [categoryPaths, setCategoryPaths] = useState<any>();
   const [categoriesTree, setCategoriesTree] = useState<any>();
   useEffect(() => {
     setCategoryPaths(undefined);
     setCategoriesTree(undefined);
-    if (releaseData) {
-      loadCategoryChildren(releaseData.attributes.hierarchies[0].id, customerToken).then(result => {
-        setCategoriesTree(result);
-        setCategoryPaths(mergeMaps(result.data));
-      });
-    }
-  }, [releaseData, customerToken]);
+    loadAllNodes(customerToken).then(result => {
+      const hierarchy = result.find((node: any) => !node.relationships.parent);
+      const tree = getChildNodes(hierarchy.id, result);
+      setCategoriesTree(tree);
+      setCategoryPaths(mergeMaps(tree));
+    });
+  }, [customerToken]);
   const categoryPathById = (id: string) => {
     return categoryPaths?.[id];
   };
@@ -551,19 +559,6 @@ function useMultiCartDataState() {
   }
 }
 
-function useReleaseDataState(customerToken: string = '') {
-  const [releaseData, setReleaseData] = useState<any>();
-
-  useEffect(() => {
-    getReleaseData(customerToken).then(res => {
-      setReleaseData(res.data);
-    });
-  }, [customerToken]);
-  return {
-    releaseData
-  }
-}
-
 function useGlobalState() {
   const translation = useTranslationState();
   const currency = useCurrencyState();
@@ -572,7 +567,6 @@ function useGlobalState() {
   const cartData = useCartItemsState();
   const multiCartData = useMultiCartDataState();
   const customerData = useCustomerDataState();
-  const releaseData = useReleaseDataState(customerData.token);
 
   return {
     translation,
@@ -582,8 +576,7 @@ function useGlobalState() {
     cartData,
     multiCartData,
     currency,
-    releaseData,
-    categories: useCategoriesNodeState(releaseData.releaseData, customerData.token),
+    categories: useCategoriesNodeState(customerData.token),
     compareProducts: useCompareProductsState(),
     authenticationSettings: useCustomerAuthenticationSettingsState(),
   };
@@ -596,7 +589,6 @@ export const [
   useAddressData,
   useOrdersData,
   useCurrency,
-  useRelease,
   useCategories,
   useCompareProducts,
   useCustomerAuthenticationSettings,
@@ -609,7 +601,6 @@ export const [
   value => value.addressData,
   value => value.ordersData,
   value => value.currency,
-  value => value.releaseData,
   value => value.categories,
   value => value.compareProducts,
   value => value.authenticationSettings,
