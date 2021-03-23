@@ -42,6 +42,7 @@ export const Product: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string>();
 
   const modalRef = useOnclickOutside(() => {
     setModalOpen(false)
@@ -66,6 +67,7 @@ export const Product: React.FC = () => {
 
   useEffect(() => {
     product && setProductId(product.id);
+    product && setImageSrc(`https://ep-demo-assets.s3-us-west-2.amazonaws.com/BELLEVIE/skuImages/${product.attributes.sku}.png`);
   }, [product]);
 
   useEffect(() => {
@@ -124,16 +126,21 @@ export const Product: React.FC = () => {
     }
   };
 
+  const handlePictureError = () => {
+    setImageSrc(imagePlaceHolder);
+  };
+
   const CartButton = () => {
     if (!productId) return null;
     if (isLoggedIn) {
+      const hasPrice = product.attributes.price && product.attributes.price[selectedCurrency] && product.attributes.price[selectedCurrency].amount;
       return (
         <div className="product__addtocartdropdowncontainer">
           <div className="product__addtocartdropdownwrap">
             <button
               className="epbtn --primary product__addtocartbtn"
               onClick={handleAddToDefaultCart}
-              disabled={!(product.attributes.price && product.attributes.price[selectedCurrency])}
+              disabled={!hasPrice}
             >
               {t("add-to-cart")}
               {' - '}
@@ -141,7 +148,7 @@ export const Product: React.FC = () => {
             </button>
             <button onClick={() => setDropdownOpen(!dropdownOpen)} className={`epbtn --primary product__addtocartdropdowntoggle${
               dropdownOpen ? " --open" : ""
-            }`} disabled={!(product.attributes.price && product.attributes.price[selectedCurrency])}>
+            }`} disabled={!hasPrice}>
               {addToCartLoading ? (
                 <SpinnerIcon className="product__addtocartdropdownicspinner" />
               ) : (
@@ -201,7 +208,7 @@ export const Product: React.FC = () => {
       {product ? (
         <div className="product__maincontainer">
           <div className="product__imgcontainer">
-            <img className="product__img" src={imagePlaceHolder} alt={product.attributes.name} />
+            <img className="product__img" src={imageSrc} alt={product.attributes.name} onError={() => handlePictureError()} />
             {/* {productImageHrefs.length > 0 && (
               <>
                 <img className="product__img" src={productImageHrefs?.[currentImageIndex]} alt={product.name} style={{ backgroundColor: productBackground }} />
@@ -226,7 +233,8 @@ export const Product: React.FC = () => {
               {product.attributes.sku}
             </div>
             <div className="product__price">
-            {product.attributes.price && product.attributes.price[selectedCurrency] && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format(product.attributes.price[selectedCurrency].amount/100)}            </div>
+              {product.attributes.price && product.attributes.price[selectedCurrency] && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format((product.attributes.price[selectedCurrency].amount || 0)/100)}
+            </div>
             {/* <Availability available={isProductAvailable(product)} />
             <div className="product__comparecheck">
               <CompareCheck product={product} />

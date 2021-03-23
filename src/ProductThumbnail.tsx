@@ -38,7 +38,7 @@ export const ProductThumbnail: React.FC<ProductThumbnailProps> = (props) => {
         {props.product.attributes.sku}
       </div>
       <div className="productthumbnail__price">
-        {props.product.attributes.price && props.product.attributes.price[selectedCurrency] && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format(props.product.attributes.price[selectedCurrency].amount/100)}
+        {props.product.attributes.price && props.product.attributes.price[selectedCurrency] && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format((props.product.attributes.price[selectedCurrency].amount || 0)/100)}
       </div>
       {/* <Availability available={isProductAvailable(props.product)}/>
       <div className={`productthumbnail__comparecheck`}>

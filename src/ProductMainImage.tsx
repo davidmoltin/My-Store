@@ -14,37 +14,29 @@ interface ProductMainImageProps {
 export const ProductMainImage: React.FC<ProductMainImageProps> = (props) => {
   const productMainImageId = '';
   const { addError } = useContext(APIErrorContext);
-  const [productImageUrl] = useResolve(
-    async () => {
-      try {
-        if (productMainImageId) {
-          return loadImageHref(productMainImageId)
-        }
-      } catch (error) {
-        addError(error.errors);
-      }
-    },
-    [productMainImageId, addError]
-  );
+  const productImageUrl = `https://ep-demo-assets.s3-us-west-2.amazonaws.com/BELLEVIE/skuImages/${props.product.attributes.sku}.png`
+  // const [productImageUrl] = useResolve(
+  //   async () => {
+  //     try {
+  //       if (productMainImageId) {
+  //         return loadImageHref(productMainImageId)
+  //       }
+  //     } catch (error) {
+  //       addError(error.errors);
+  //     }
+  //   },
+  //   [productMainImageId, addError]
+  // );
   const productBackground = '';
 
   return (
     <>
-      {productImageUrl ? (
-        <ImageContainer
-        imgClassName="productmainimage"
-        imgUrl={productImageUrl}
-        alt={props.product.attributes.name}
-        imageStyle={{ width: props.size, height: props.size, objectFit: 'fill', backgroundColor: productBackground }}
-        />
-      ) : (
-        <ImageContainer
-        imgClassName="productmainimage"
-        imgUrl={imagePlaceHolder}
-        alt={props.product.attributes.name}
-        imageStyle={{ width: props.size, height: props.size, objectFit: 'fill', backgroundColor: productBackground }}
-        />
-      )}
+      <ImageContainer
+      imgClassName="productmainimage"
+      imgUrl={productImageUrl}
+      alt={props.product.attributes.name}
+      imageStyle={{ width: props.size, height: props.size, objectFit: 'fill', backgroundColor: productBackground }}
+      />
     </>
   );
 };

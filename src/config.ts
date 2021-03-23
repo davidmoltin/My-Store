@@ -1,6 +1,6 @@
 
 export const config = {
-  clientId: process.env.REACT_APP_CLIENT_ID || '8WPbd15xBRQiX84I5YH21ffwLfpdLfFLGPBissIoeb',
+  clientId: process.env.REACT_APP_CLIENT_ID || 'IUAEUOPNMKiNgKhvqKeaMwysZoaUZQfr1BClUvWiJZ',
   stripeKey: process.env.REACT_APP_STRIPE_KEY || 'pk_test_YknKfRnn0FyonEJnRe4RClIp00k5zLjbOG',
   categoryPageSize: 8,
   maxCompareProducts: 4,
@@ -8,9 +8,9 @@ export const config = {
   algoliaApiKey: process.env.REACT_APP_ALGOLIA_API_KEY || 'placeholder',
   algoliaPlacesAppId: process.env.REACT_APP_ALGOLIA_PLACES_APP_ID || 'plFT2ZOVWLZD',
   algoliaPlacesApiKey: process.env.REACT_APP_ALGOLIA_PLACES_API_KEY || 'placeholder',
-  algoliaIndexName: process.env.REACT_APP_ALGOLIA_INDEX_NAME || '2517043716422632107_product',
+  algoliaIndexName: process.env.REACT_APP_ALGOLIA_INDEX_NAME || '2281607301905252519_product',
   compareKeys: process.env.REACT_APP_COMPARE_KEYS?.split(',') || [],
-  endpointURL: process.env.REACT_APP_ENDPOINT_URL || 'epcc-integration.global.ssl.fastly.net',
+  endpointURL: process.env.REACT_APP_ENDPOINT_URL || 'api.moltin.com',
   b2b: process.env.REACT_APP_B2B_ENABLE || false,
   supportedLocales: process.env.REACT_APP_SUPPORTED_LOCALES?.split(',').map(el => JSON.parse(el)) || [
     {

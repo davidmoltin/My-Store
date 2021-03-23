@@ -16,6 +16,7 @@
     margin-top: 10px;
     font-size: $sizeInitial;
     font-weight: bold;
+    max-width: 160px;
 
     #{$block}__namelink {
       &:hover {
@@ -60,6 +61,10 @@
     .productmainimage {
       height: 180px;
       width: 180px;
+    }
+
+    #{$block}__name {
+      max-width: 180px;
     }
   }
 }

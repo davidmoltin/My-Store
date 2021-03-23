@@ -2,6 +2,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import imagePlaceHolder from './images/img_missing_horizontal@2x.png'
 
 interface ImageContainerProps {
   imgUrl: string;
@@ -58,7 +59,7 @@ export const ImageContainer: React.FC<ImageContainerProps> = (props) => {
   );
 
   const handlePictureError = () => {
-    setError(true);
+    setImageSrc(imagePlaceHolder);
   };
 
   if (!error) {
