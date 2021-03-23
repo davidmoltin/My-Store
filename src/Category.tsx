@@ -9,6 +9,7 @@ import { Pagination } from './Pagination';
 import { useResolve } from './hooks';
 
 import './Category.scss';
+import { config } from './config';
 
 function useCategoryProducts(categoryId: string | undefined, pageNum: number) {
   const { selectedLanguage } = useTranslation();
@@ -26,7 +27,9 @@ function useCategoryProducts(categoryId: string | undefined, pageNum: number) {
     // during initial loading of categories categoryId might be undefined
     if (categoryId) {
       const result = await loadCategoryProducts(categoryId, pageNum, selectedLanguage, selectedCurrency, token);
-      setTotalPages(1);
+      const lastUrl = new URL(`http://null.com${result.links.last}`);
+      const lastOffset = lastUrl.searchParams.get('page[offset]') || '0';
+      setTotalPages(parseInt(lastOffset)/config.categoryPageSize + 1);
       return result;
     }
   }, [categoryId, pageNum, selectedLanguage, selectedCurrency, token]);

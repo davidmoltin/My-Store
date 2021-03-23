@@ -55,18 +55,18 @@ function getProductCache(key: string, language: string, currency: string): molti
   return productCache[`${key}:${language}:${currency}`];
 }
 
-export async function loadCategoryProducts(categoryId: string, pageNum: number, language: string, currency: string, customerToken: string): Promise<moltin.Resource<moltin.PcmProduct[]>> {
+export async function loadCategoryProducts(categoryId: string, pageNum: number, language: string, currency: string, customerToken: string): Promise<any> {
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency, headers: {
     'X-Moltin-Customer-Token': customerToken,
   }});
   moltin.config.version = 'experimental';
-  const result = await moltin.request.send(`catalog/nodes/${categoryId}/relationships/products`, 'GET');
+  const result = await moltin.request.send(`catalog/nodes/${categoryId}/relationships/products?page[limit]=${config.categoryPageSize}&page[offset]=${(pageNum - 1) * config.categoryPageSize}`, 'GET');
 
   for (const product of result.data) {
     setProductCache(product.id, language, currency, product as any as moltin.PcmProduct);
   }
 
-  return result as any as moltin.Resource<moltin.PcmProduct[]>;
+  return result;
 }
 
 const imageHrefCache: { [key: string]: string } = {};
