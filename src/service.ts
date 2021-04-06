@@ -300,5 +300,5 @@ export async function loadAllNodes(customerToken: string) : Promise<any[]>{
 
   const nodes = results.reduce((acc, c) => [...acc, ...c.data],[...result.data]);
 
-  return nodes;
+  return nodes.sort((a: any, b: any) => new Date(a.attributes.created_at) < new Date(b.attributes.created_at) ? -1 : 1);
 }
