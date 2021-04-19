@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
-import { useTranslation, useCartData, useMultiCartData } from './app-state';
+import { useTranslation, useCartData, useMultiCartData, useCustomerData } from './app-state';
 import { bulkAdd } from './service';
 
 import { ReactComponent as ClearIcon } from './images/icons/ic_clear.svg';
@@ -16,6 +16,7 @@ export const BulkOrder: React.FC = (props) => {
   const { t } = useTranslation();
   const { updateCartItems, setCartQuantity, handleShowCartPopup } = useCartData();
   const { updateCartData } = useMultiCartData();
+  const { token } = useCustomerData();
   const [bulkOrderItems, setBulkOrderItems] = useState([]);
   const [bulkError, setBulkError] = useState('');
   const [showLoader, setShowLoader] = useState(false);
@@ -31,7 +32,7 @@ export const BulkOrder: React.FC = (props) => {
       setShowLoader(true);
       const totalQuantity = bulkOrderItems.reduce((sum, { quantity }) => sum + quantity, 0);
       const mcart = localStorage.getItem('mcart') || '';
-      bulkAdd(mcart, bulkOrderItems)
+      bulkAdd(mcart, bulkOrderItems, token)
         .then(() => {
           updateCartItems();
           updateCartData();

@@ -221,8 +221,10 @@ export async function addToCart(reference: string, productId: string, customerTo
   await moltin.Cart(reference).AddProduct(productId, quantity);
 }
 
-export async function bulkAdd(reference: string, data: moltin.CartItemObject[]): Promise<moltin.CartItemsResponse> {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId });
+export async function bulkAdd(reference: string, data: moltin.CartItemObject[], customerToken: string): Promise<moltin.CartItemsResponse> {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
+    'X-Moltin-Customer-Token': customerToken,
+  } });
   const result = await moltin.Cart(reference).BulkAdd(data);
 
   return result;
