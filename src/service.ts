@@ -100,11 +100,11 @@ export async function loadImageHref(imageId: string): Promise<string | undefined
 }
 
 export async function loadProductBySlug(productSlug: string, language: string, currency: string, customerToken: string) {
-  const cachedProduct = getProductCache(productSlug, language, currency);
+  // const cachedProduct = getProductCache(productSlug, language, currency);
 
-  if (cachedProduct) {
-    return cachedProduct;
-  }
+  // if (cachedProduct) {
+  //   return cachedProduct;
+  // }
 
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency, headers: {
     'X-Moltin-Customer-Token': customerToken,
@@ -115,7 +115,7 @@ export async function loadProductBySlug(productSlug: string, language: string, c
 
   const product = result.data.length > 0 && result.data[0];
 
-  setProductCache(product.attributes.slug, language, currency, product);
+  // setProductCache(product.attributes.slug, language, currency, product);
 
   return product;
 }
