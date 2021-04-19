@@ -88,7 +88,7 @@ export const Product: React.FC = () => {
     const currentCart = localStorage.getItem("mcart") || "";
     const mcart = cartId ? cartId : currentCart;
     setAddToCartLoading(true);
-    return addToCart(mcart, productId)
+    return addToCart(mcart, productId, token)
       .then(() => {
         if (cartId && cartId !== currentCart) {
           localStorage.setItem('mcart', cartId);

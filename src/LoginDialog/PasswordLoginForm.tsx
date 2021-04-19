@@ -67,7 +67,7 @@ export const PasswordLoginForm: React.FC<PasswordLoginFormProps> = (props) => {
           setCustomerData(result.token, result.customer_id);
           setIsLoading(false);
           createDefaultCart();
-          if(browserHistory.location.pathname === "/registration" || browserHistory.location.pathname.includes("/category"))
+          if(browserHistory.location.pathname === "/registration" || browserHistory.location.pathname.includes("/category") || browserHistory.location.pathname.includes("/product"))
           {
             history.push('/');
           }

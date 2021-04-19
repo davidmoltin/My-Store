@@ -213,8 +213,10 @@ export async function deleteCart(reference: string) {
   await moltin.Cart(reference).Delete();
 }
 
-export async function addToCart(reference: string, productId: string): Promise<void> {
-  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId });
+export async function addToCart(reference: string, productId: string, customerToken: string): Promise<void> {
+  const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
+    'X-Moltin-Customer-Token': customerToken,
+  } });
   const quantity = 1;
   await moltin.Cart(reference).AddProduct(productId, quantity);
 }
