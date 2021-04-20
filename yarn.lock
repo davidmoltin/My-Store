@@ -1450,15 +1450,15 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@moltin/sdk@^7.0.0-beta.4":
-  version "7.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@moltin/sdk/-/sdk-7.0.0-beta.6.tgz#1fc9e3f6384b6da10034ccc47aae89cfd692b848"
-  integrity sha512-KSStruLMZIlctxBBUndIQFY8R+s6IA28iv0atPIarWfc0T/NIuHPNsk78QzcIUacggJuzwJIW6TkjLo0Qh+zLQ==
+"@moltin/sdk@^7.0.0-beta.20":
+  version "7.0.0-beta.20"
+  resolved "https://registry.yarnpkg.com/@moltin/sdk/-/sdk-7.0.0-beta.20.tgz#1f884ca35c820aad2f1ed398db4b266f5079e598"
+  integrity sha512-wIEQQvPlEYUxifBRu5ExDA8laDLgTG5IDKV10q8k4pfoQ63oi9CBT/tTi7zOENF9PUehRfkKV8XYmM4hSBegYw==
   dependencies:
     es6-promise "^4.0.5"
     fetch-everywhere "^1.0.5"
     inflected "^2.0.1"
-    node-localstorage "^2.0.0"
+    node-localstorage "^2.1.6"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -7952,7 +7952,7 @@ node-libs-browser@^2.2.1:
     util "^0.11.0"
     vm-browserify "^1.0.1"
 
-node-localstorage@^2.0.0:
+node-localstorage@^2.1.6:
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/node-localstorage/-/node-localstorage-2.1.6.tgz#7c62120beff8abbf960c858da70fddcfc336898a"
   integrity sha512-yE7AycE5G2hU55d+F7Ona9nx97C+enJzWWx6jrsji7fuPZFJOvuW3X/LKKAcXRBcEIJPDOKt8ZiFWFmShR/irg==
