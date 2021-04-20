@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
-import { useTranslation, useCartData, useMultiCartData, useCustomerData } from './app-state';
+import { useTranslation, useCartData, useMultiCartData, useCustomerData, useCurrency } from './app-state';
 import { bulkAdd } from './service';
 import { ReactComponent as ClearIcon } from './images/icons/ic_clear.svg';
 
 import './QuickOrder.scss'
 
 export const QuickOrder: React.FC = (props) => {
-  const { t } = useTranslation();
+  const { t, selectedLanguage } = useTranslation();
+  const { selectedCurrency } = useCurrency();
   const { updateCartItems, setCartQuantity, handleShowCartPopup } = useCartData();
   const { updateCartData } = useMultiCartData();
   const { token } = useCustomerData();
@@ -77,7 +78,7 @@ export const QuickOrder: React.FC = (props) => {
     setError('');
     setShowLoader(true);
     const totalQuantity = products.reduce((sum, { quantity }) => sum + quantity, 0);
-    bulkAdd(mcart, products, token)
+    bulkAdd(mcart, products, token, selectedLanguage, selectedCurrency)
       .then(() => {
         updateCartItems();
         updateCartData();
