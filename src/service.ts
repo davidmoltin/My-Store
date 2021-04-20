@@ -59,7 +59,7 @@ export async function loadCategoryProducts(categoryId: string, pageNum: number, 
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency, headers: {
     'X-Moltin-Customer-Token': customerToken,
   }});
-  moltin.config.version = 'experimental';
+  moltin.config.version = 'pcm';
   const result = await moltin.request.send(`catalog/nodes/${categoryId}/relationships/products?page[limit]=${config.categoryPageSize}&page[offset]=${(pageNum - 1) * config.categoryPageSize}`, 'GET');
 
   for (const product of result.data) {
@@ -109,7 +109,7 @@ export async function loadProductBySlug(productSlug: string, language: string, c
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency, headers: {
     'X-Moltin-Customer-Token': customerToken,
   } });
-  moltin.config.version = 'experimental';
+  moltin.config.version = 'pcm';
 
   const result = await moltin.request.send(`catalog/products?filter=eq(slug,${productSlug})`, 'GET');
 
@@ -194,7 +194,7 @@ export async function getProductsByIds(ids: string[], customerToken: string): Pr
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
     'X-Moltin-Customer-Token': customerToken,
   } });
-  moltin.config.version = 'experimental';
+  moltin.config.version = 'pcm';
   const productsRequests = ids.map(id => moltin.request.send(`catalog/products/${id}`, 'GET'));
   const products = await Promise.all(productsRequests);
 
@@ -290,7 +290,7 @@ export async function loadAllNodes(customerToken: string) : Promise<any[]>{
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, headers: {
     'X-Moltin-Customer-Token': customerToken,
   }  });
-  moltin.config.version = 'experimental';
+  moltin.config.version = 'pcm';
   const limit = 25;
   const result = await moltin.request.send(`catalog/nodes?page[offset]=0&page[limit]=${limit}`, 'GET');
   const lastUrl = new URL(`http://null.com${result.links.last}`);
