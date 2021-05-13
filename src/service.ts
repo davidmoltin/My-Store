@@ -51,10 +51,6 @@ function setProductCache(key: string, language: string, currency: string, produc
   productCache[`${key}:${language}:${currency}`] = product;
 }
 
-function getProductCache(key: string, language: string, currency: string): moltin.PcmProduct | undefined {
-  return productCache[`${key}:${language}:${currency}`];
-}
-
 export async function loadCategoryProducts(categoryId: string, pageNum: number, language: string, currency: string, customerToken: string): Promise<any> {
   const moltin = MoltinGateway({ host: config.endpointURL, client_id: config.clientId, language, currency, headers: {
     'X-Moltin-Customer-Token': customerToken,

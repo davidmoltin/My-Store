@@ -17,7 +17,7 @@ export const ImageContainer: React.FC<ImageContainerProps> = (props) => {
   } = props;
 
   const imgAlt = alt != null ? alt : '';
-  const [error, setError] = useState(false);
+  const [error] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>();
   const [imageRef, setImageRef] = useState<any>();
 

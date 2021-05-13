@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import useOnclickOutside from 'react-cool-onclickoutside';
-import { useResolve, useProductImages } from './hooks';
+import { useResolve } from './hooks';
 import { addToCart, loadProductBySlug } from './service';
-import { CompareCheck } from './CompareCheck';
 import { SocialShare } from './SocialShare';
 import {
   useTranslation,
@@ -12,8 +11,6 @@ import {
   useMultiCartData,
   useCustomerData,
 } from "./app-state";
-import { isProductAvailable } from './helper';
-import { Availability } from './Availability';
 import { VariationsSelector } from './VariationsSelector';
 import { SettingsCart } from './SettingsCart';
 import { ReactComponent as CloseIcon } from './images/icons/ic_close.svg';
