@@ -1,0 +1,8 @@
+[template.environment]
+  REACT_APP_CLIENT_ID = "EPCC Client ID"
+  REACT_APP_STRIPE_KEY = "Stripe Publishable Key"
+  REACT_APP_ALGOLIA_APP_ID =  "Algolia App ID"
+  REACT_APP_ALGOLIA_API_KEY = "Algolia API key"
+  REACT_APP_ALGOLIA_PLACES_APP_ID = "Algolia Places App ID"
+  REACT_APP_ALGOLIA_PLACES_API_KEY = "Algolia Places API ID"
+  REACT_APP_ALGOLIA_INDEX_NAME = "Algolia Index Name"
