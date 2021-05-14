@@ -4,3 +4,6 @@
   REACT_APP_ALGOLIA_APP_ID =  "Algolia App ID"
   REACT_APP_ALGOLIA_API_KEY = "Algolia API Key"
   REACT_APP_ALGOLIA_INDEX_NAME = "Algolia Index Name"
+
+[build]
+  command = "./netlifybuild.sh"
