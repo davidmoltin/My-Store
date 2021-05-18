@@ -1,6 +1,5 @@
 [template.environment]
   REACT_APP_CLIENT_ID = "EPCC Client ID"
-  REACT_APP_STRIPE_KEY = "Stripe Publishable Key"
   REACT_APP_ENDPOINT_URL = "EPCC API base URL"
 
 [build]
